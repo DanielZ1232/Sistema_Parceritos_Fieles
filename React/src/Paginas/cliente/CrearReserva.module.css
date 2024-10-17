@@ -1,0 +1,99 @@
+/* CrearReserva.module.css */
+
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Asegura que el contenedor cubra toda la altura de la ventana */
+}
+
+.container {
+  max-width: 600px;
+  margin: 20px auto; /* Centra el contenedor horizontalmente y añade margen superior */
+  padding: 20px;
+  background-color: #ffffff; /* Fondo blanco para el contenedor del formulario */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.formRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.formGroup {
+  flex: 1;
+  min-width: 200px; /* Ajusta el ancho mínimo para los grupos de formulario */
+  margin-bottom: 15px;
+}
+
+.fullWidth {
+  flex: 100%;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+input[type="date"],
+input[type="tel"],
+input[type="email"],
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+}
+
+.button:hover {
+  background-color: #45a049;
+}
+
+.footer {
+  background-color: #f1f1f1; /* Color de fondo del footer */
+  text-align: center;
+  padding: 10px;
+}
+
+.whatsappButton {
+  position: fixed;
+  bottom: 20px; /* Ajusta la distancia desde el fondo */
+  right: 20px; /* Ajusta la distancia desde el borde derecho */
+  background-color: #25D366; /* Color de WhatsApp */
+  color: #fff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-size: 24px;
+  text-decoration: none;
+  z-index: 1000; /* Asegura que el botón esté sobre otros elementos */
+}
+
+.whatsappButton:hover {
+  background-color: #128C7E; /* Color verde más oscuro al pasar el mouse */
+}

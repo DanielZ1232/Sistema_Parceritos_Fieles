@@ -1,0 +1,279 @@
+{
+  "Usuarios": [
+    {
+      "Nombre": "Daniel",
+      "Apellido": "Zuñiga",
+      "Correo": "dzuniga873@gmail.com",
+      "Contraseña": "1234567",
+      "Celular": "3166617088",
+      "Direccion": "Calle 158 #96 a - 77",
+      "TipoDocumento": "CC",
+      "NumeroDocumento": "1127615970",
+      "id": "1724617958266",
+      "Rol": "Empleado"
+    },
+    {
+      "id": "1724787393052",
+      "Nombre": "Luis",
+      "Apellido": "Becerra",
+      "Correo": "lugobecerra9@gmail.com",
+      "Celular": "3115958040",
+      "Direccion": "diagonal 104 #140-31",
+      "TipoDocumento": "CC",
+      "NumeroDocumento": "1025524584",
+      "Contraseña": "lugo1234",
+      "Rol": "Cliente"
+    },
+    {
+      "id": "1724820219075",
+      "Nombre": "Miguel ",
+      "Apellido": "Uran",
+      "Correo": "migueluran597@gmail.com",
+      "Celular": "3506842198",
+      "Direccion": "kr 114 # 152-d12",
+      "TipoDocumento": "CC",
+      "NumeroDocumento": "1019029870",
+      "Contraseña": "123456",
+      "Rol": "Gerente"
+    },
+    {
+      "id": "1724860548680",
+      "Nombre": "Miguel",
+      "Apellido": "Duran",
+      "Correo": "migueluran465@gmail.com",
+      "Celular": "3506842198",
+      "Direccion": "kr 114 # 152-d12",
+      "TipoDocumento": "CC",
+      "NumeroDocumento": "1213141516",
+      "Contraseña": "123456",
+      "Rol": "Empleado"
+    },
+    {
+      "id": "1724862281241",
+      "Nombre": "erick",
+      "Apellido": "granados ",
+      "Correo": "snarly@misena.edu.co",
+      "Celular": "3506842198",
+      "Direccion": "kr 114 # 152-d12",
+      "TipoDocumento": "CC",
+      "NumeroDocumento": "1213141520",
+      "Contraseña": "123456",
+      "Rol": "Empleado"
+    },
+    {
+      "id": "1725854300786",
+      "Nombre": "Juan",
+      "Apellido": "Lopez",
+      "Correo": "juan12@gmail.com",
+      "Celular": "32345867",
+      "Direccion": "cra 104 #140-31",
+      "TipoDocumento": "CC",
+      "NumeroDocumento": "1025647583",
+      "Contraseña": "1234567890",
+      "Rol": "Cliente"
+    },
+    {
+      "id": "1726030337285",
+      "Nombre": "Pepe",
+      "Apellido": "Castro",
+      "Correo": "castro123@gmail.com",
+      "Celular": "32345867",
+      "Direccion": "cra 104 #140-31",
+      "TipoDocumento": "CC",
+      "NumeroDocumento": "1025647532",
+      "Contraseña": "Castro1#",
+      "Rol": "Cliente"
+    }
+  ],
+  "Mascotas": [
+    {
+      "id": "ffdb",
+      "nombre": "Sassy",
+      "raza": "Pincher",
+      "enfermedades": "Ninguna",
+      "peso": "4 kg",
+      "edad": "13",
+      "sexo": "Hembra",
+      "esterilizado": "si",
+      "usuarioId": "1724787393052"
+    },
+    {
+      "id": "de30",
+      "nombre": "Tommy",
+      "raza": "Criollo",
+      "enfermedades": "No tiene",
+      "peso": "20kg",
+      "edad": "4",
+      "sexo": "Macho",
+      "esterilizado": "si",
+      "usuarioId": "1724787393052"
+    },
+    {
+      "id": "92de",
+      "nombre": "Miguel",
+      "raza": "Pitbull",
+      "enfermedades": "Ninguna",
+      "peso": "82 kg",
+      "edad": "17",
+      "sexo": "Macho",
+      "esterilizado": "no",
+      "usuarioId": "1724787393052"
+    }
+  ],
+  "Reservas": [
+    {
+      "id": "317f",
+      "fechaInicio": "2024-08-28",
+      "fechaFinal": "2024-08-31",
+      "mascota": "miguel",
+      "celular": "3133186012",
+      "correo": "lugobecerra9@gmail.com",
+      "estado": "Por Confirmar",
+      "usuarioId": "1724787393052"
+    },
+    {
+      "id": "a62e",
+      "fechaInicio": "2024-09-10",
+      "fechaFinal": "2024-09-25",
+      "mascota": "rocky",
+      "celular": "3115958041",
+      "correo": "lugobecerra9@gmail.com",
+      "estado": "Confirmada",
+      "usuarioId": "1724787393052"
+    },
+    {
+      "id": "154d",
+      "fechaInicio": "2024-09-15",
+      "fechaFinal": "2024-09-22",
+      "mascota": "Miguel",
+      "celular": "3166617088",
+      "correo": "migueluran597@gmail.com",
+      "estado": "Por Confirmar",
+      "usuarioId": "1724787393052"
+    }
+  ],
+  "Quejas": [
+    {
+      "id": "8240",
+      "texto": "Muy mal servicio con el empleado Daniel\nterrile no si",
+      "usuarioId": "1724787393052",
+      "nombre": "Luis",
+      "correo": "lugobecerra9@gmail.com",
+      "fecha": "2024-08-28",
+      "hora": "08:23:01",
+      "Respuesta": "ok"
+    },
+    {
+      "id": "4961",
+      "texto": "mala gestion ",
+      "usuarioId": "1724862281241",
+      "nombre": "erick",
+      "correo": "snarly@misena.edu.co",
+      "fecha": "2024-08-28",
+      "hora": "11:31:10",
+      "Respuesta": ""
+    },
+    {
+      "id": "be2c",
+      "texto": "nono",
+      "usuarioId": "1724787393052",
+      "nombre": "Luis",
+      "correo": "lugobecerra9@gmail.com",
+      "fecha": "2024-09-11",
+      "hora": "20:52:57",
+      "Respuesta": "que?"
+    },
+    {
+      "id": "4fe8",
+      "texto": "Que mal servicio, iu\n",
+      "usuarioId": "1724787393052",
+      "nombre": "Luis",
+      "correo": "lugobecerra9@gmail.com",
+      "fecha": "2024-09-11",
+      "hora": "23:00:48",
+      "Respuesta": "mesi"
+    },
+    {
+      "id": "6e1d0b7d-9e9a-436b-8034-406d96b98fe6",
+      "texto": "Que mal servicio, nono",
+      "usuarioId": "1724787393052",
+      "nombre": "Luis",
+      "correo": "lugobecerra9@gmail.com",
+      "fecha": "2024-09-11",
+      "hora": "10:41:39",
+      "Respuesta": ""
+    }
+  ],
+  "Opiniones": [
+    {
+      "id": "1",
+      "texto": "Excelente servicio, mi perro siempre está feliz y bien cuidado. Recomiendo Parceritos Fieles al 100%!",
+      "nombre": "Ana Pérez",
+      "fecha": "2024-09-01",
+      "hora": "12:00:00"
+    },
+    {
+      "id": "2",
+      "texto": "Un lugar maravilloso para mi perro. El personal es muy atento y se nota el amor por los animales.",
+      "nombre": "Carlos Rodríguez",
+      "fecha": "2024-09-02",
+      "hora": "14:30:00"
+    },
+    {
+      "id": "2024-09-06T17:19:19.692Z",
+      "texto": "la verdad un servicio un poco regular, apenas cumple con los estandares de una buena guarderia",
+      "nombre": "pan",
+      "fecha": "2024-09-06",
+      "hora": "17:19:19"
+    },
+    {
+      "id": "2024-09-09T04:03:19.616Z",
+      "texto": "gran servicio",
+      "nombre": "miguel",
+      "fecha": "2024-09-09",
+      "hora": "04:03:19"
+    },
+    {
+      "id": "2024-09-10T01:24:37.217Z",
+      "texto": "un servicio completo",
+      "nombre": "pedro",
+      "fecha": "2024-09-10",
+      "hora": "01:24:37"
+    },
+    {
+      "id": "2024-09-10T03:34:33.790Z",
+      "texto": "dsadsadsad",
+      "nombre": "dsadsa",
+      "fecha": "2024-09-10",
+      "hora": "03:34:33"
+    },
+    {
+      "id": "2024-09-10T04:03:14.862Z",
+      "texto": "un gran servicio",
+      "nombre": "juan",
+      "fecha": "2024-09-10",
+      "hora": "04:03:14"
+    },
+    {
+      "id": "2024-09-10T04:04:34.703Z",
+      "texto": "muy buen contenido y alimentacion",
+      "nombre": "luis alejandro",
+      "fecha": "2024-09-10",
+      "hora": "04:04:34"
+    },
+    {
+      "id": "2024-09-10T04:14:24.569Z",
+      "texto": "dsasadsadsadsadsadas sd sad sad sd sad sad sadsadds das dsad  d asdsa dsa dsad sd sad sads dsa dsad sad sadsa",
+      "nombre": "pan",
+      "fecha": "2024-09-10",
+      "hora": "04:14:24"
+    },
+    {
+      "id": "2024-09-11T05:54:20.665Z",
+      "texto": "Nose pues si no doy mi opinion es por que no la conozco, pero pienso que es genial",
+      "nombre": "Eric",
+      "fecha": "2024-09-11",
+      "hora": "05:54:20"
+    }
+  ]
+}

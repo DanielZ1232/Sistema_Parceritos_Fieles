@@ -1,0 +1,75 @@
+.pageContainer {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
+    margin: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #bfbcbcbf;
+    font-weight: bold;
+}
+
+.cancelIcon {
+    color: #f00; /* Color rojo para el icono */
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.cancelIcon:hover {
+    color: #c00; /* Color rojo oscuro en hover */
+}
+
+.filterContainer {
+    margin-top: 20px;
+}
+
+.footer {
+    background-color: #333;
+    padding: 20px;
+    text-align: center;
+    color: white;
+}
+
+.whatsappButton {
+    position: fixed;
+    bottom: 20px; /* Ajusta la distancia desde el fondo */
+    right: 20px; /* Ajusta la distancia desde el borde derecho */
+    background-color: #25D366; /* Color de WhatsApp */
+    color: #fff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 24px;
+    text-decoration: none;
+    z-index: 1000; /* Asegura que el botón esté sobre otros elementos */
+}
+
+.whatsappButton:hover {
+    background-color: #128C7E; /* Color verde más oscuro al pasar el mouse */
+}
