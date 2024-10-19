@@ -6,6 +6,7 @@ import Footer from '../../components/footer';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
+
 const HeroSection = styled.section`
   position: relative;
   width: 100%;
@@ -57,6 +58,20 @@ const NavLinks = styled.div`
   margin-right: 61px;
 `;
 
+const Circle = styled.div`
+  width: 40px; 
+  height: 40px; 
+  background-color: orange; /* Color del círculo */
+  border-radius: 50%; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase; /* Para asegurarse de que las letras estén en mayúsculas */
+`;
+
 const Dropdown = styled.div`
   position: relative;
 
@@ -99,6 +114,7 @@ const DropdownContentLink = styled.a`
 
 const MenuEmpleado = () => {
   const [nombre, setNombre] = useState('');
+  const [initials, setInitials] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -107,6 +123,8 @@ const MenuEmpleado = () => {
     console.log("Nombre de usuario desde localStorage:", nombreUsuario);
 
     if (nombreUsuario) {
+      const iniciales = `${nombreUsuario.charAt(0)}`;
+      setInitials(iniciales);
       setNombre(nombreUsuario); // Asignar el nombre al estado si está presente
     } else {
       console.log('No se encontró el nombre del usuario en localStorage');
@@ -121,10 +139,18 @@ const MenuEmpleado = () => {
       showConfirmButton: false,
       timer: 1500
     }).then(() => {
-      localStorage.removeItem('userToken');
+      // Limpiar todos los datos de la sesión del localStorage
+      localStorage.removeItem('usuarioId');
+      localStorage.removeItem('nombreUsuario'); // Si estás guardando más información, asegúrate de remover todo
+  
+      // También puedes limpiar todo el localStorage si es necesario
+      // localStorage.clear();
+  
+      // Redirigir al usuario a la página de inicio de sesión
       navigate('/');
     });
   };
+  
 
   return (
     <div>
@@ -154,12 +180,16 @@ const MenuEmpleado = () => {
               </DropdownContent>
             </Dropdown>
             <Dropdown>
-              <Link href="#">Cuenta</Link>
-              <DropdownContent className="dropdown-content">
-                <DropdownContentLink href="/miPerfilE">Mi Perfil</DropdownContentLink>
-                <DropdownContentLink href="#" onClick={handleLogout}>Cerrar sesión</DropdownContentLink>
-              </DropdownContent>
-            </Dropdown>
+            <Circle>
+              {initials} {/* Muestra las iniciales dentro del círculo */}
+            </Circle>
+            <DropdownContent className="dropdown-content">
+              <DropdownContentLink href="/miPerfilE">Mi Perfil</DropdownContentLink>
+              <DropdownContentLink href="#" onClick={handleLogout}>
+                Cerrar sesión
+              </DropdownContentLink>
+            </DropdownContent>
+          </Dropdown>
           </NavLinks>
         </Navbar>
 

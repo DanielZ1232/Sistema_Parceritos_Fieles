@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom'; // Importa useNavigate para redirección
 import Swal from 'sweetalert2'; // Importa SweetAlert2
@@ -53,6 +53,20 @@ const Link = styled.a`
   padding: 15px 30px;
 `;
 
+const Circle = styled.div`
+  width: 40px; 
+  height: 40px; 
+  background-color: orange; /* Color del círculo */
+  border-radius: 50%; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase; /* Para asegurarse de que las letras estén en mayúsculas */
+`;
+
 const DropdownContent = styled.div`
   display: none;
   position: absolute;
@@ -78,6 +92,18 @@ const DropdownContentLink = styled.a`
 
 const NavBarEmpleado = () => {
   const navigate = useNavigate(); // Hook para redirección
+  const [initials, setInitials] = useState('');
+
+  useEffect(() => {
+    // Obtener el nombre completo del usuario desde localStorage
+    const nombreUsuario = localStorage.getItem('nombreUsuario') || '';
+
+    if (nombreUsuario) {
+      // Tomar la primera letra del nombre y del apellido
+      const iniciales = `${nombreUsuario.charAt(0)}`;
+      setInitials(iniciales);
+    }
+  }, []);
 
   const handleLogout = () => {
     // Muestra la alerta de éxito antes de redirigir
@@ -126,10 +152,14 @@ const NavBarEmpleado = () => {
             </DropdownContent>
           </Dropdown>
           <Dropdown>
-            <Link href="#">Cuenta</Link>
+            <Circle>
+              {initials} {/* Muestra las iniciales dentro del círculo */}
+            </Circle>
             <DropdownContent className="dropdown-content">
               <DropdownContentLink href="/miPerfilE">Mi Perfil</DropdownContentLink>
-              <DropdownContentLink href="#" onClick={handleLogout}>Cerrar sesión</DropdownContentLink>
+              <DropdownContentLink href="#" onClick={handleLogout}>
+                Cerrar sesión
+              </DropdownContentLink>
             </DropdownContent>
           </Dropdown>
         </Nav>

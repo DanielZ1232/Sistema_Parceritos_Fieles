@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+function handleDisconnect() {
 // Conexión a la base de datos
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -18,22 +19,28 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
-db.connect((err) => {
+db.connect(function (err) {
   if (err) {
-    console.error('Error al conectar a MySQL:', err);
-    process.exit(1);
+    console.error('Error al conectar a MySQL:', err.message);
+    setTimeout(handleDisconnect, 2000);  // Reintentar la conexión en 2 segundos
+  } else {
+    console.log('Conectado a la base de datos MySQL');
   }
-  console.log('Conectado a la base de datos MySQL');
-
-   // Verificación de conexión con una consulta simple
-   db.query('SELECT 1', (err, results) => {
-    if (err) {
-      console.error('Error de conexión:', err.message);
-    } else {
-      console.log('Conexión a la base de datos exitosa');
-    }
-  });
 });
+
+db.on('error', function (err) {
+  console.error('Error de conexión a MySQL:', err.message);
+  if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+    handleDisconnect();  // Reconectar automáticamente si la conexión se pierde
+  } else {
+    throw err;
+  }
+});
+
+return db;
+}
+
+const db = handleDisconnect();
 
 
 // Ruta para obtener usuarios
@@ -50,17 +57,18 @@ app.get('/api/users', (req, res) => {
   });
   
   // Ruta para crear un usuario
-  app.post('/api/users', (req, res) => {
-    const { Nombre, Apellido, Correo, Celular, Direccion, TipoDocumento, NumeroDocumento, Contraseña, Rol } = req.body;
+  app.post('/api/register', (req, res) => {
+    const { Nombre, Apellido, Correo, Celular, Direccion, TipoDocumento, NumeroDocumento, Contraseña } = req.body;
   
-    if (!Nombre || !Apellido || !Correo || !Celular || !Direccion || !TipoDocumento || !NumeroDocumento || !Contraseña || !Rol) {
+    if (!Nombre || !Apellido || !Correo || !Celular || !Direccion || !TipoDocumento || !NumeroDocumento || !Contraseña) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
   
+    // Verificar si el usuario ya existe
     const verificarUsuarioQuery = 'SELECT * FROM usuario WHERE correo = ?';
     db.query(verificarUsuarioQuery, [Correo], (err, results) => {
       if (err) {
-        console.error('Error al verificar el usuario:', err.message); // Muestra el mensaje del error en la consola
+        console.error('Error al verificar el usuario:', err.message);
         return res.status(500).json({ error: 'Error al verificar el usuario.' });
       }
   
@@ -68,20 +76,27 @@ app.get('/api/users', (req, res) => {
         return res.status(409).json({ error: 'Ya existe un usuario con este correo.' });
       }
   
+      // Crear el nuevo usuario en la tabla 'usuario'
       const crearUsuarioQuery = `
         INSERT INTO usuario (nombre, apellido, correo, direccion, tipo_Documento, numero_Documento, celular, contraseña, rol) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Cliente')
       `;
-      db.query(crearUsuarioQuery, [Nombre, Apellido, Correo, Direccion, TipoDocumento, NumeroDocumento, Celular, Contraseña, Rol], (err, results) => {
+  
+      db.query(crearUsuarioQuery, [Nombre, Apellido, Correo, Direccion, TipoDocumento, NumeroDocumento, Celular, Contraseña], (err, result) => {
         if (err) {
           console.error('Error al crear el usuario:', err.message);
           return res.status(500).json({ error: 'Error al crear el usuario.' });
         }
   
-        res.status(201).json({ message: 'Usuario creado exitosamente.', id: results.insertId });
+        console.log('Usuario creado exitosamente con ID:', result.insertId);
+        res.status(201).json({ message: 'Usuario registrado exitosamente como Cliente.' });
       });
     });
   });
+  
+  
+  
+  
   
   
   
@@ -96,16 +111,18 @@ app.listen(PORT, () => {
 app.post('/api/login', (req, res) => {
   const { correo, contraseña } = req.body;
 
-  // Verifica que ambos campos están presentes
   if (!correo || !contraseña) {
     return res.status(400).json({ error: 'Correo y contraseña son obligatorios.' });
   }
 
-  // Consulta para buscar el usuario por correo
   const buscarUsuarioQuery = 'SELECT * FROM usuario WHERE correo = ?';
+
+  // Agregar logs para depurar
+  console.log("Realizando consulta SQL para el correo:", correo);
+
   db.query(buscarUsuarioQuery, [correo], (err, results) => {
     if (err) {
-      console.error('Error al verificar el usuario:', err.message);
+      console.error('Error al ejecutar la consulta SQL:', err.message);  // Agregar el mensaje exacto del error
       return res.status(500).json({ error: 'Error al verificar el usuario.' });
     }
 
@@ -115,20 +132,21 @@ app.post('/api/login', (req, res) => {
 
     const usuario = results[0];
 
-    // Verificación de contraseña
     if (usuario.contraseña !== contraseña) {
       return res.status(401).json({ error: 'Correo o contraseña incorrectos.' });
     }
 
-    // Inicio de sesión exitoso - devolver también el nombre del usuario
     res.status(200).json({
       message: 'Inicio de sesión exitoso',
       usuarioId: usuario.id_Usuario,
-      nombre: usuario.nombre,  // Incluir el nombre del usuario en la respuesta
+      nombre: usuario.nombre,
       rol: usuario.rol
     });
   });
 });
+
+
+
 
 
 

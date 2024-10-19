@@ -164,11 +164,11 @@ const Index2 = () => {
             confirmButtonColor: '#3085d6',
             confirmButtonText: 'Aceptar'
           }).then(() => {
-            // Guardar tanto el usuarioId como el nombre en localStorage
+            // Guardar datos en localStorage
             localStorage.setItem('usuarioId', usuarioId);
-            localStorage.setItem('nombreUsuario', nombre); // Asegúrate de que el nombre se está guardando aquí
+            localStorage.setItem('nombreUsuario', nombre);
       
-            // Navegar según el rol del usuario
+            // Redirigir según el rol
             switch (rol) {
               case 'Cliente':
                 navigate('/menu');
