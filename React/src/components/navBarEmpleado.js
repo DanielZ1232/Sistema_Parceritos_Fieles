@@ -27,8 +27,10 @@ const Nav = styled.div`
   padding: 0;
   width: 100%;
   justify-content: flex-end;
-  margin-right: 70px;
+  margin-right: 20px;
   font-size: large;
+  font-family: Poppins-Medium;
+  color: black;
 `;
 
 const Dropdown = styled.div`

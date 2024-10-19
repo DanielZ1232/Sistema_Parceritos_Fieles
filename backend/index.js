@@ -90,3 +90,47 @@ app.get('/api/users', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
+
+
+
+app.post('/api/login', (req, res) => {
+  const { correo, contraseña } = req.body;
+
+  // Verifica que ambos campos están presentes
+  if (!correo || !contraseña) {
+    return res.status(400).json({ error: 'Correo y contraseña son obligatorios.' });
+  }
+
+  // Consulta para buscar el usuario por correo
+  const buscarUsuarioQuery = 'SELECT * FROM usuario WHERE correo = ?';
+  db.query(buscarUsuarioQuery, [correo], (err, results) => {
+    if (err) {
+      console.error('Error al verificar el usuario:', err.message);
+      return res.status(500).json({ error: 'Error al verificar el usuario.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({ error: 'Correo o contraseña incorrectos.' });
+    }
+
+    const usuario = results[0];
+
+    // Verificación de contraseña
+    if (usuario.contraseña !== contraseña) {
+      return res.status(401).json({ error: 'Correo o contraseña incorrectos.' });
+    }
+
+    // Inicio de sesión exitoso - devolver también el nombre del usuario
+    res.status(200).json({
+      message: 'Inicio de sesión exitoso',
+      usuarioId: usuario.id_Usuario,
+      nombre: usuario.nombre,  // Incluir el nombre del usuario en la respuesta
+      rol: usuario.rol
+    });
+  });
+});
+
+
+
+
+

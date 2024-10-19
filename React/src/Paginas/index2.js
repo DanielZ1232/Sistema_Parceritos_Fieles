@@ -39,13 +39,12 @@ const Index2 = () => {
     const [registerNumeroDocumento, setRegisterNumeroDocumento] = useState('');
     const [registerContraseña, setRegisterContraseña] = useState('');
     const [registerConfirmarContraseña, setRegisterConfirmarContraseña] = useState('');
+    const [accountModalVisible, setAccountModalVisible] = useState(false);
+    const [alreadyLoggedInModalVisible, setAlreadyLoggedInModalVisible] = useState(false);
+
 
     
-    const handleRegisterClick = (e) => {
-      e.preventDefault();
-      setLoginModalVisible(false);
-      setRegisterModalVisible(true);
-  };
+
 
   const images = [Imagen1, Imagen2, Imagen3, Imagen4, Imagen5, Imagen6];
     const navigate = useNavigate();
@@ -128,110 +127,108 @@ const Index2 = () => {
         },
     };
 
+    const handleAccountClick = () => {
+        if (!isLoggedIn) {
+            setAccountModalVisible(true);
+        } else {
+            setAlreadyLoggedInModalVisible(true);
+        }
+    };
+
+    const handleLoginClick = () => {
+        setLoginModalVisible(true);
+        setAccountModalVisible(false);
+    };
+
+    const handleOpenRegisterModal = () => {
+        setRegisterModalVisible(true);
+        setAccountModalVisible(false);
+    };
    
    
     const manejarInicioSesion = async (e) => {
-      e.preventDefault();
-
-      try {
-          const respuesta = await axios.get('http://localhost:3002/Usuarios');
-          const usuarios = respuesta.data;
-
-          const usuario = usuarios.find(
-              user => user.Correo === correo && user.Contraseña === contraseña
-          );
-
-          if (usuario) {
-              Swal.fire({
-                  title: 'Inicio de sesión exitoso',
-                  text: 'Bienvenido de nuevo!',
-                  icon: 'success',
-                  confirmButtonColor: '#3085d6',
-                  confirmButtonText: 'Aceptar'
-              }).then(() => {
-                  localStorage.setItem('usuarioId', usuario.id);
-
-                  switch (usuario.Rol) {
-                      case 'Cliente':
-                          navigate('/menu');
-                          break;
-                      case 'Empleado':
-                          navigate('/menuEmpleado');
-                          break;
-                      case 'Gerente':
-                          navigate('/menuGerente');
-                          break;
-                      default:
-                          Swal.fire({
-                              title: 'Error',
-                              text: 'Rol desconocido',
-                              icon: 'error',
-                              confirmButtonColor: '#3085d6',
-                              confirmButtonText: 'Aceptar'
-                          });
-                          break;
-                  }
-
-                  setLoginModalVisible(false);
-              });
-          } else {
-              Swal.fire({
+        e.preventDefault();
+      
+        try {
+          const response = await axios.post('http://localhost:5000/api/login', {
+            correo,
+            contraseña
+          });
+      
+          const { usuarioId, rol, nombre } = response.data;
+      
+          Swal.fire({
+            title: 'Inicio de sesión exitoso',
+            text: `Bienvenido de nuevo, ${nombre}!`,
+            icon: 'success',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Aceptar'
+          }).then(() => {
+            // Guardar tanto el usuarioId como el nombre en localStorage
+            localStorage.setItem('usuarioId', usuarioId);
+            localStorage.setItem('nombreUsuario', nombre); // Asegúrate de que el nombre se está guardando aquí
+      
+            // Navegar según el rol del usuario
+            switch (rol) {
+              case 'Cliente':
+                navigate('/menu');
+                break;
+              case 'Empleado':
+                navigate('/menuEmpleado');
+                break;
+              case 'Gerente':
+                navigate('/menuGerente');
+                break;
+              default:
+                Swal.fire({
                   title: 'Error',
-                  text: 'Correo o contraseña incorrectos',
+                  text: 'Rol desconocido',
                   icon: 'error',
                   confirmButtonColor: '#3085d6',
                   confirmButtonText: 'Aceptar'
-              });
-          }
-      } catch (error) {
-          console.error('Error al iniciar sesión:', error);
-          Swal.fire({
+                });
+                break;
+            }
+      
+            setLoginModalVisible(false);
+          });
+        } catch (error) {
+          if (error.response && error.response.status === 401) {
+            Swal.fire({
+              title: 'Error',
+              text: 'Correo o contraseña incorrectos',
+              icon: 'error',
+              confirmButtonColor: '#3085d6',
+              confirmButtonText: 'Aceptar'
+            });
+          } else {
+            console.error('Error al iniciar sesión:', error);
+            Swal.fire({
               title: 'Error',
               text: 'Error al iniciar sesión',
               icon: 'error',
               confirmButtonColor: '#3085d6',
               confirmButtonText: 'Aceptar'
-          });
-      }
-  };
+            });
+          }
+        }
+      };
+      
+      
+      
 
-  const handleRegisterSubmit = async (e) => {
-    e.preventDefault();
-
-    if (registerContraseña !== registerConfirmarContraseña) {
-        Swal.fire({
-            title: 'Error',
-            text: 'Las contraseñas no coinciden',
-            icon: 'error',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Aceptar'
-        });
-        return;
-    }
+      const handleRegisterSubmit = async (e) => {
+        e.preventDefault();
+        if (registerContraseña !== registerConfirmarContraseña) {
+            Swal.fire({ title: 'Error', text: 'Las contraseñas no coinciden', icon: 'error' });
+            return;
+        }
 
     
-    if (!validatePassword(registerContraseña)) {
-      Swal.fire({
-          title: 'Error',
-          text: 'La contraseña debe contener al menos una letra mayúscula, un número y un signo especial',
-          icon: 'error',
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'Aceptar'
-      });
-      return;
-  }
-
-  // Valida la contraseña
-  if (!validatePassword(registerContraseña)) {
-    Swal.fire({
-      title: 'Error',
-      text: 'La contraseña debe tener al menos una mayúscula, un número y un carácter especial',
-      icon: 'error',
-      confirmButtonColor: '#3085d6',
-      confirmButtonText: 'Aceptar'
-    });
-    return;
-  }
+        if (!validatePassword(registerContraseña)) {
+            Swal.fire({ title: 'Error', text: 'La contraseña debe contener al menos una letra mayúscula, un número y un signo especial', icon: 'error' });
+            return;
+        }
 
   try {
     // Crear el nuevo usuario
@@ -290,37 +287,9 @@ const validatePassword = (password) => {
 
   return hasUpperCase && hasSpecialChar && hasNumber;
 };
-const handleAccountClick = () => {
-    if (!isLoggedIn) {
-        Swal.fire({
-            title: "¿Tienes cuenta?",
-            icon: "warning",
-            showCancelButton: false, // Ocultar botón de registro
-            confirmButtonColor: "#3085d6",
-            confirmButtonText: "Iniciar sesión",
-            allowOutsideClick: true, // Permitir clic fuera
-            customClass: {
-                popup: 'my-popup' // Clase personalizada para la alerta
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                setLoginModalVisible(true); // Abre el modal de inicio de sesión
-            }
-            // Si se hace clic fuera, no se hace nada
-        });
-    } else {
-        Swal.fire({
-            title: 'Ya estás logueado',
-            icon: 'info',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Aceptar',
-            allowOutsideClick: true, // Permitir clic fuera
-            customClass: {
-                popup: 'my-popup' // Clase personalizada para la alerta
-            }
-        });
-    }
-};
+
+
+  
 
 // Añade CSS para cambiar la tipografía de la alerta
 const style = document.createElement('style');
@@ -656,12 +625,33 @@ const loginModalRef = useRef(null); // Define el ref para el modal
                 <button type="button" onClick={() => setLoginModalVisible(false)} className="close-modal">Cerrar</button>
                 <div className="form-links">
                     <a href="#">¿Olvidaste tu Contraseña?</a>
-                    <a href="#" onClick={handleRegisterClick}>¿No tienes cuenta? Regístrate!</a>
+                    <a href="#" onClick={handleOpenRegisterModal}>¿No tienes cuenta? Regístrate!</a>
                 </div>
             </form>
         </div>
     </div>
 )}
+
+{accountModalVisible && (
+  <div style={modalStyles.modalOverlay} onClick={() => setAccountModalVisible(false)}>
+    <div style={modalStyles.modalContent} onClick={(e) => e.stopPropagation()}>
+      <h2 style={modalStyles.modalTitle}>¿Tienes cuenta?</h2>
+      <div style={modalStyles.modalButtons}>
+        <button onClick={handleLoginClick} style={{ ...modalStyles.button, ...modalStyles.loginButton }}>
+          Iniciar Sesión
+        </button>
+        <button onClick={handleOpenRegisterModal} style={{ ...modalStyles.button, ...modalStyles.registerButton }}>
+          Registrarse
+        </button>
+      </div>
+      <button onClick={() => setAccountModalVisible(false)} style={modalStyles.closeModal}>
+        Cerrar
+      </button>
+    </div>
+  </div>
+)}
+
+
 
             {/* Modal de registro */}
             {registerModalVisible && (
@@ -785,6 +775,7 @@ const loginModalRef = useRef(null); // Define el ref para el modal
 
 
 const styles = {
+    
     serviciosSection: {
         backgroundColor: 'white',
         padding: '50px 20px',
@@ -935,8 +926,75 @@ lista: {
     lineHeight: '1.6',
     color: '#112D32',
 },
+
+
 };
 
+const modalStyles = {
+    modalOverlay: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000,
+    },
+    modalContent: {
+      backgroundColor: '#ffffff',
+      padding: '30px 40px',
+      borderRadius: '12px',
+      width: '350px',
+      textAlign: 'center',
+      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
+      animation: 'fadeIn 0.3s ease',
+    },
+    modalTitle: {
+      fontSize: '1.8rem',
+      fontFamily: 'Poppins, sans-serif',
+      color: '#333',
+      marginBottom: '20px',
+    },
+    modalButtons: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      gap: '15px',
+      marginTop: '20px',
+      marginBottom: '30px',
+    },
+    button: {
+      padding: '12px 20px',
+      fontSize: '1rem',
+      borderRadius: '6px',
+      border: 'none',
+      cursor: 'pointer',
+      transition: 'background-color 0.3s ease, transform 0.2s ease',
+      width: '100%',
+      fontWeight: 'bold',
+    },
+    loginButton: {
+      backgroundColor: '#007bff',
+      color: '#fff',
+    },
+    registerButton: {
+      backgroundColor: '#28a745',
+      color: '#fff',
+    },
+    closeModal: {
+      marginTop: '10px',
+      padding: '10px 15px',
+      backgroundColor: '#ff4d4d',
+      color: '#fff',
+      fontSize: '0.9rem',
+      borderRadius: '5px',
+      border: 'none',
+      cursor: 'pointer',
+    },
+  };
+  
 
 
 export default Index2;
