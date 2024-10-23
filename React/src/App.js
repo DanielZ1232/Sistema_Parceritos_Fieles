@@ -33,7 +33,7 @@ import ConsultarQuejasG from './Paginas/gerente/consultarQuejasG';
 import MiPerfilG from './Paginas/gerente/MiPerfilG';
 import ActualizarMisDatosG from './Paginas/gerente/ActualizarMisDatosG';
 import VerPerfilMascotaG from './Paginas/gerente/VerPerfilMascotaG';
-
+import Asistencias from './Paginas/empleado/asistencia';
 
 
 
@@ -70,6 +70,7 @@ const App = () => {
                     <Route path="/MiPerfilG" element={<MiPerfilG/>} />
                     <Route path="/actualizarDatosG" element={<ActualizarMisDatosG/>} />
                     <Route path='/verPerfilMascotaG' element={<VerPerfilMascotaG />} />
+                    <Route path='/asistencia' element={<Asistencias />} />
                 </Routes>
         </Router>
     );

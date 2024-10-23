@@ -333,3 +333,63 @@ app.put('/api/quejas/:id_Queja', (req, res) => {
       res.status(200).json({ message: 'Queja actualizada exitosamente' });
   });
 });
+
+
+// Ruta para agregar asistencia
+app.post('/asistencias', (req, res) => {
+  const { id_Mascota, tipo_asistencia, fecha, hora_llegada, hora_salida, asistio } = req.body;
+  const sql = `INSERT INTO asistencias (id_Mascota, tipo_asistencia, fecha, hora_llegada, hora_salida, asistio) VALUES (?, ?, ?, ?, ?, ?)`;
+  const values = [id_Mascota, tipo_asistencia, fecha, hora_llegada, hora_salida, asistio];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error('Error al insertar asistencia:', err);
+      res.status(500).send('Error al insertar asistencia');
+    } else {
+      res.status(201).send('Asistencia registrada exitosamente');
+    }
+  });
+});
+
+// Ruta para obtener mascotas con el servicio de colegio del cliente específico
+app.get('/mascotas/colegio', (req, res) => {
+  const sql = `
+    SELECT m.id_Mascota, m.nombre, c.direccion AS direccion_dueño, c.celular AS celular_dueño
+    FROM clientemascota cm
+    JOIN mascotas m ON cm.id_MascotaFK = m.id_Mascota
+    JOIN usuario c ON cm.id_ClienteFK1 = c.id_Usuario
+    JOIN servicios s ON s.id_MascotaFK = m.id_Mascota
+    WHERE s.tipo_servicio = 'colegio'
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error al obtener mascotas del colegio:', err);
+      return res.status(500).send('Error al obtener mascotas del colegio');
+    }
+
+    console.log('Resultados obtenidos:', results);
+    res.status(200).json(results);
+  });
+});
+
+// Ruta para obtener mascotas con reserva de hotel o pasadía del cliente específico
+app.get('/mascotas/reservas/:tipoAsistencia', (req, res) => {
+  const tipoAsistencia = req.params.tipoAsistencia;
+  const sql = `
+    SELECT m.id_Mascota, m.nombre, c.direccion AS direccion_dueño, c.celular AS celular_dueño
+    FROM clientemascota cm
+    JOIN mascotas m ON cm.id_MascotaFK = m.id_Mascota
+    JOIN usuario c ON cm.id_ClienteFK1 = c.id_Usuario
+    JOIN servicios s ON s.id_MascotaFK = m.id_Mascota
+    WHERE s.tipo_servicio = ?
+  `;
+
+  db.query(sql, [tipoAsistencia], (err, results) => {
+    if (err) {
+      console.error('Error al obtener mascotas:', err);  // Mostrar el error exacto en la consola
+      return res.status(500).send(`Error al obtener mascotas: ${err.message}`);  // Enviar el error detallado al cliente
+    }
+    res.status(200).json(results);
+  });
+});

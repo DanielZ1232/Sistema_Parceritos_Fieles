@@ -137,6 +137,7 @@ const NavBarEmpleado = () => {
             <Link href="#">Mascotas</Link>
             <DropdownContent className="dropdown-content">
               <DropdownContentLink href="/consultarMascotasE">Consultar</DropdownContentLink>
+              <DropdownContentLink href="/asistencia">Asistencia</DropdownContentLink>
             </DropdownContent>
           </Dropdown>
           <Dropdown>
