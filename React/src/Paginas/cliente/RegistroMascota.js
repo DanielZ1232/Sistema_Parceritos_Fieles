@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import './registrar_mascota.css'; // Asegúrate de que esta ruta es correcta
 import Swal from 'sweetalert2';
+import axios from 'axios';
+
 
 const RegistroMascota = () => {
   const [formData, setFormData] = useState({
@@ -14,61 +16,65 @@ const RegistroMascota = () => {
     peso: '',
     edad: '',
     sexo: '',
-    esterilizado: '', // Valor inicial como cadena vacía
+    esterilizado: '',
   });
 
+  // Manejo de cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    // Formatear el valor solo si el campo es 'nombre'
+
     let formattedValue = value;
     if (name === 'nombre') {
-      formattedValue = value
-        .toLowerCase()
-        .replace(/^\w/, c => c.toUpperCase()); // Capitaliza la primera letra
-    } else if (name === 'edad') {
-      // Validar que el valor de edad no sea negativo
-      formattedValue = value;
-      if (parseInt(value, 10) < 0) {
-        formattedValue = '';
-        Swal.fire({
-          icon: 'warning',
-          title: 'Edad Inválida',
-          text: 'La edad no puede ser negativa.',
-          confirmButtonText: 'Aceptar'
-        });
-      }
+      formattedValue = value.toLowerCase().replace(/^\w/, c => c.toUpperCase());
+    } else if (name === 'edad' && parseInt(value, 10) < 0) {
+      formattedValue = '';
+      Swal.fire({
+        icon: 'warning',
+        title: 'Edad Inválida',
+        text: 'La edad no puede ser negativa.',
+        confirmButtonText: 'Aceptar'
+      });
     }
 
-    // Depuración
-    console.log(`Campo: ${name}, Valor: ${formattedValue}`);
-
-    // Actualizar el estado del formulario
     setFormData({
       ...formData,
       [name]: formattedValue
     });
   };
 
+  // Manejo de envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Obtén el ID del usuario desde el localStorage
-    const usuarioId = localStorage.getItem('usuarioId'); // Ajusta la clave si es diferente
-
-    // Asegúrate de que el ID del usuario se agregue al formData
-    const formDataConUsuario = { ...formData, usuarioId };
-
-    try {
-      const response = await fetch('http://localhost:3002/Mascotas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formDataConUsuario)
+    const usuarioId = localStorage.getItem('usuarioId');
+  
+    if (!usuarioId) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo obtener el ID del usuario.',
+        confirmButtonText: 'Aceptar'
       });
-
-      if (response.ok) {
+      return;
+    }
+  
+    // Limpia los valores antes de enviarlos
+    const cleanFormData = {
+      nombre: formData.nombre.trim(),
+      raza: formData.raza.trim(),
+      enfermedades: formData.enfermedades.trim(),
+      peso: parseInt(formData.peso.trim()),  // Asegura que peso sea un número entero
+      edad: parseInt(formData.edad),         // Asegura que edad sea un número entero
+      sexo: formData.sexo.trim(),
+      esterilizado: formData.esterilizado,
+      usuarioId
+    };
+  
+    try {
+      const response = await axios.post('http://localhost:5000/api/mascotas', cleanFormData);
+  
+      if (response.status === 201) {
         Swal.fire({
           position: 'top-end',
           icon: 'success',
@@ -83,19 +89,18 @@ const RegistroMascota = () => {
           peso: '',
           edad: '',
           sexo: '',
-          esterilizado: '', // Restablece a cadena vacía
+          esterilizado: '',
         });
       } else {
-        console.error('Error al registrar la mascota:', response.status);
         Swal.fire({
           icon: 'error',
-          title: 'Error al registrar la mascota',
-          text: 'Por favor, intente nuevamente.',
+          title: 'Error',
+          text: 'Error al registrar la mascota. Por favor, intente nuevamente.',
           confirmButtonText: 'Aceptar'
         });
       }
     } catch (error) {
-      console.error('Error de red:', error);
+      console.error('Error de red:', error.response || error.message);  // Verifica más detalles sobre el error
       Swal.fire({
         icon: 'error',
         title: 'Error de red',
@@ -104,6 +109,7 @@ const RegistroMascota = () => {
       });
     }
   };
+
 
   return (
     <div className="page-container">

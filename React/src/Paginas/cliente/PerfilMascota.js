@@ -1,24 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Importa useNavigate para redirigir
-import NavBarCliente from '../../components/navBarCliente'; // Asegúrate de que la ruta es correcta
-import Footer from '../../components/footer'; // Asegúrate de que la ruta es correcta
+import { useParams, useNavigate } from 'react-router-dom';
+import NavBarCliente from '../../components/navBarCliente'; 
+import Footer from '../../components/footer'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
-import './PerfilMascota.css'; // Asegúrate de que esta ruta es correcta
-import Swal from 'sweetalert2'; // Importa Swal
-
-// Importa la imagen
-import PerroImg from '../../assets/Imagenes/perro2.jpeg'; // Ajusta la ruta si es necesario
+import './PerfilMascota.css'; 
+import Swal from 'sweetalert2'; 
+import PerroImg from '../../assets/Imagenes/perro2.jpeg'; 
 
 const PerfilMascota = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Obtenemos el id de la mascota desde la URL
   const [mascota, setMascota] = useState(null);
-  const navigate = useNavigate(); // Hook para redirigir
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMascota = async () => {
       try {
-        const response = await fetch(`http://localhost:3002/Mascotas/${id}`); // URL del endpoint
+        const response = await fetch(`http://localhost:5000/api/mascotas/${id}`);  // Utiliza el ID de la mascota aquí
         if (response.ok) {
           const data = await response.json();
           setMascota(data);
@@ -29,13 +27,13 @@ const PerfilMascota = () => {
         console.error('Error de red:', error);
       }
     };
-
+  
     fetchMascota();
-  }, [id]);
+  }, [id]);  // El ID debe ser el de la mascota
+  
 
   // Función para eliminar la mascota
   const handleEliminar = async () => {
-    // Muestra el diálogo de confirmación
     const result = await Swal.fire({
       title: "¿Estás seguro?",
       text: "¡No podrás revertir esto!",
@@ -47,20 +45,19 @@ const PerfilMascota = () => {
       cancelButtonText: "Cancelar"
     });
 
-    // Si el usuario confirma la eliminación
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:3002/Mascotas/${id}`, {
-          method: 'DELETE', // Método DELETE para eliminar el recurso
+        const response = await fetch(`http://localhost:5000/api/mascotas/${id}`, {
+          method: 'DELETE',
         });
 
         if (response.ok) {
           await Swal.fire({
             title: "Eliminado!",
-            text: "Tu archivo ha sido eliminado.",
+            text: "La mascota ha sido eliminada.",
             icon: "success"
           });
-          navigate('/consultar-mascota'); // Redirige a la página ConsultarMascotas después de eliminar
+          navigate('/consultar-mascota'); // Redirige después de eliminar
         } else {
           console.error('Error al eliminar la mascota:', response.status);
           await Swal.fire({
@@ -91,7 +88,7 @@ const PerfilMascota = () => {
             <h1>Perfil de la Mascota</h1>
             <center>
               <div className="user-img">
-                <img src={PerroImg} alt="Perfil de la mascota" /> {/* Usa la imagen importada */}
+                <img src={PerroImg} alt="Perfil de la mascota" />
               </div>
             </center>
             <div className="info-section">
@@ -106,7 +103,7 @@ const PerfilMascota = () => {
                 </div>
                 <div className="info-item">
                   <i className="fa-solid fa-paw" />
-                  <span>Peso<br />{mascota.peso}</span>
+                  <span>Peso<br />{mascota.peso} kg</span>
                 </div>
               </div>
               <div className="info-ite2">
@@ -116,7 +113,7 @@ const PerfilMascota = () => {
                 </div>
                 <div className="info-item">
                   <i className="fa-solid fa-paw" />
-                  <span>Enfermedades<br />{mascota.enfermedades}</span>
+                  <span>Enfermedades<br />{mascota.enfermedades || "No tiene"}</span>
                 </div>
                 <div className="info-item-direc">
                   <i className="fa-solid fa-paw" />
@@ -135,7 +132,6 @@ const PerfilMascota = () => {
         )}
       </div>
       <Footer />
-      {/* Círculo flotante con WhatsApp */}
       <a 
         href="https://wa.me/3103409688" 
         className="whatsapp-float" 

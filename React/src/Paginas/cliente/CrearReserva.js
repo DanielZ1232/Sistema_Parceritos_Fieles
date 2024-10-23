@@ -13,7 +13,7 @@ const CrearReserva = () => {
     mascota: '',
     celular: '',
     correo: '',
-    estado: 'Por Confirmar'
+    estado: 'Por Confirmar',
   });
 
   const [mascotas, setMascotas] = useState([]);
@@ -24,13 +24,14 @@ const CrearReserva = () => {
 
   useEffect(() => {
     const fetchMascotas = async () => {
-      if (!userId) return; // Asegurarse de que userId esté disponible
+      if (!userId) return;
       try {
         const response = await axios.get('http://localhost:3002/Mascotas');
-        const mascotasUsuario = response.data.filter(mascota => mascota.usuarioId === userId);
+        const mascotasUsuario = response.data.filter(
+          (mascota) => mascota.usuarioId === userId
+        );
         setMascotas(mascotasUsuario);
       } catch (error) {
-        console.error('Error al obtener las mascotas:', error);
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -48,7 +49,6 @@ const CrearReserva = () => {
         const response = await axios.get('http://localhost:3002/Usuarios');
         setUsuarios(response.data);
       } catch (error) {
-        console.error('Error al obtener los usuarios:', error);
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -64,7 +64,7 @@ const CrearReserva = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -72,47 +72,36 @@ const CrearReserva = () => {
     e.preventDefault();
 
     if (!userId) {
-      console.error('ID del usuario no encontrado en localStorage');
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'ID del usuario no encontrado. Por favor, inicie sesión nuevamente.'
+        text: 'ID del usuario no encontrado. Por favor, inicie sesión nuevamente.',
       });
       return;
     }
 
     const reserva = {
       ...formData,
-      usuarioId: userId
+      usuarioId: userId,
     };
 
     try {
       const response = await axios.post('http://localhost:3002/Reservas', reserva, {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       if (response.status === 201) {
         Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Reserva creada exitosamente",
+          position: 'top-end',
+          icon: 'success',
+          title: 'Reserva creada exitosamente',
           showConfirmButton: false,
-          timer: 1500
+          timer: 1500,
         });
 
-        const usuario = usuarios.find(user => user.id === userId);
-
-        if (!usuario) {
-          console.error('Usuario no encontrado');
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Usuario no encontrado. Verifique su sesión.',
-          });
-          return;
-        }
+        const usuario = usuarios.find((user) => user.id === userId);
 
         const templateParams = {
           to_name: usuario.Nombre,
@@ -122,7 +111,7 @@ const CrearReserva = () => {
           fechaFinal: formData.fechaFinal,
           mascota: formData.mascota,
           celular: formData.celular,
-          correo: formData.correo
+          correo: formData.correo,
         };
 
         try {
@@ -133,14 +122,13 @@ const CrearReserva = () => {
             'QyL_P2wB9V3Z0clnB'
           );
           Swal.fire({
-            position: "top-end",
-            icon: "success",
-            title: "Correo de confirmación enviado exitosamente",
+            position: 'top-end',
+            icon: 'success',
+            title: 'Correo de confirmación enviado exitosamente',
             showConfirmButton: false,
-            timer: 1500
+            timer: 1500,
           });
         } catch (emailError) {
-          console.error('Error al enviar el correo:', emailError);
           Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -153,10 +141,9 @@ const CrearReserva = () => {
           fechaFinal: '',
           mascota: '',
           celular: '',
-          correo: ''
+          correo: '',
         });
       } else {
-        console.error('Error al crear la reserva:', response.status);
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -164,7 +151,6 @@ const CrearReserva = () => {
         });
       }
     } catch (error) {
-      console.error('Error de red:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -174,82 +160,109 @@ const CrearReserva = () => {
   };
 
   return (
-    <div className={styles.pageContainer}>
+    <div className={styles.reservaPageContainer}>
       <NavBarCliente />
-      <div className={styles.container}>
-        <h2>Crear Reserva</h2>
-        <form onSubmit={handleSubmit}>
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label htmlFor="fechaInicio">Fecha de inicio:</label>
-              <input 
-                type="date" 
-                id="fechaInicio" 
-                name="fechaInicio" 
-                value={formData.fechaInicio}
-                onChange={handleChange}
-                min={today}
-                required 
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="fechaFinal">Fecha de final:</label>
-              <input 
-                type="date" 
-                id="fechaFinal" 
-                name="fechaFinal" 
-                value={formData.fechaFinal}
-                onChange={handleChange}
-                min={today}
-                required 
-              />
-            </div>
+      <div className={styles.reservaLoginWrap}>
+        <div className={styles.reservaLoginHtml}>
+          <input id="tab-1" type="radio" name="tab" className={styles.reservaSignIn} defaultChecked />
+          <label htmlFor="tab-1" className={`${styles.reservaTab} ${styles.activeTab}`}>Hotel</label>
+          <input id="tab-2" type="radio" name="tab" className={styles.reservaSignUp} />
+          <label htmlFor="tab-2" className={styles.reservaTab}>Estadia</label>
+          <div className={styles.reservaLoginForm}>
+            <form onSubmit={handleSubmit} className={styles.reservaForm}>
+              <div className={styles.reservaRow}>
+                <div className={styles.reservaGroup}>
+                  <label htmlFor="fechaInicio" className={styles.reservaLabel}>Fecha de inicio</label>
+                  <input 
+                    type="date" 
+                    id="fechaInicio" 
+                    name="fechaInicio" 
+                    value={formData.fechaInicio}
+                    onChange={handleChange}
+                    className={styles.reservaInput}
+                    min={today}
+                    required
+                  />
+                </div>
+                <div className={styles.reservaGroup}>
+                  <label htmlFor="fechaFinal" className={styles.reservaLabel}>Fecha de final</label>
+                  <input 
+                    type="date"
+                    id="fechaFinal"
+                    name="fechaFinal"
+                    value={formData.fechaFinal}
+                    onChange={handleChange}
+                    className={styles.reservaInput}
+                    min={today}
+                    required
+                  />
+                </div>
+              </div>
+              <div className={styles.reservaRow}>
+                <div className={styles.reservaGroup}>
+                  <label htmlFor="mascota" className={styles.reservaLabel}>Seleccione mascota</label>
+                  <select 
+                    id="mascota" 
+                    name="mascota"
+                    value={formData.mascota}
+                    onChange={handleChange}
+                    className={styles.reservaInput}
+                    required
+                  >
+                    <option value="">Seleccione una opción</option>
+                    {mascotas.map(mascota => (
+                      <option key={mascota.id} value={mascota.nombre}>
+                        {mascota.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className={styles.reservaGroup}>
+                  <label htmlFor="celular" className={styles.reservaLabel}>Celular</label>
+                  <input 
+                    type="tel"
+                    id="celular"
+                    name="celular"
+                    placeholder="Ingrese su número de celular"
+                    value={formData.celular}
+                    onChange={handleChange}
+                    className={styles.reservaInput}
+                    required
+                  />
+                </div>
+              </div>
+              <div className={styles.reservaRow}>
+                <div className={styles.reservaGroup}>
+                  <label htmlFor="correo" className={styles.reservaLabel}>Correo</label>
+                  <input 
+                    type="email"
+                    id="correo"
+                    name="correo"
+                    placeholder="Ingrese su correo electrónico"
+                    value={formData.correo}
+                    onChange={handleChange}
+                    className={styles.reservaInput}
+                    required
+                  />
+                </div>
+                <div className={styles.reservaGroup}>
+                  <label htmlFor="confirmCorreo" className={styles.reservaLabel}>Confirmar Correo</label>
+                  <input 
+                    type="email"
+                    id="confirmCorreo"
+                    name="confirmCorreo"
+                    placeholder="Confirme su correo electrónico"
+                    className={styles.reservaInput}
+                    required
+                  />
+                </div>
+              </div>
+              <div className={`${styles.reservaGroup} ${styles.reservaFullWidth}`}>
+                <button type="submit" className={styles.reservaButton}>Registrar</button>
+              </div>
+            </form>
           </div>
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label htmlFor="mascota">Seleccione mascota:</label>
-              <select 
-                id="mascota" 
-                name="mascota" 
-                value={formData.mascota}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Seleccione una opción</option>
-                {mascotas.map(mascota => (
-                  <option key={mascota.id} value={mascota.nombre}>
-                    {mascota.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="celular">Celular:</label>
-              <input 
-                type="tel" 
-                id="celular" 
-                name="celular" 
-                placeholder="Ingrese su número de celular" 
-                value={formData.celular}
-                onChange={handleChange}
-                required 
-              />
-            </div>
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="correo">Correo:</label>
-            <input 
-              type="email" 
-              id="correo" 
-              name="correo" 
-              placeholder="Ingrese su correo electrónico" 
-              value={formData.correo}
-              onChange={handleChange}
-              required 
-            />
-          </div>
-          <button type="submit" className={styles.button}>Registrar</button>
-        </form>
+        </div>
       </div>
       <Footer className={styles.footer} />
       <a href="https://wa.me/1234567890" className={styles.whatsappButton} target="_blank" rel="noopener noreferrer">

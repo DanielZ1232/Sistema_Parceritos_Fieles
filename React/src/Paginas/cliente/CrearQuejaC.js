@@ -1,44 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import NavBarCliente from '../../components/navBarCliente'; // Ajusta la ruta según tu estructura de carpetas
-import Footer from '../../components/footer'; // Ajusta la ruta según tu estructura de carpetas
+import React, { useState } from 'react';
+import NavBarCliente from '../../components/navBarCliente'; 
+import Footer from '../../components/footer'; 
 import './crearQuejaC.css';
-import Logo from '../../assets/Imagenes/logo.png'; // Asegúrate de que la ruta es correcta
+import Logo from '../../assets/Imagenes/logo.png'; 
 import Swal from 'sweetalert2';
-import { v4 as uuidv4 } from 'uuid'; // Para generar IDs únicos
 
 const CrearQuejaC = () => {
     const maxLength = 250; // Número máximo de caracteres permitidos
     const [text, setText] = useState(''); // Estado para almacenar el texto del textarea
     const [isSaving, setIsSaving] = useState(false); // Estado para manejar el estado de guardado
-    const [userData, setUserData] = useState(null); // Estado para almacenar los datos del usuario
 
     const userId = localStorage.getItem('usuarioId'); // Obtén el ID del usuario desde el localStorage
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch(`http://localhost:3002/Usuarios/${userId}`); // Ajusta la URL según la configuración de tu API
-                if (response.ok) {
-                    const data = await response.json();
-                    setUserData(data);
-                } else {
-                    console.error('Error al obtener los datos del usuario.');
-                }
-            } catch (error) {
-                console.error('Error al obtener los datos del usuario:', error);
-            }
-        };
-
-        fetchUserData();
-    }, [userId]);
-
     // Manejador para actualizar el texto y el contador de caracteres
     const handleChange = (event) => {
-        setText(event.target.value);
+        const inputText = event.target.value;
+        // Convierte la primera letra en mayúscula y el resto permanece igual
+        const formattedText = inputText.charAt(0).toUpperCase() + inputText.slice(1);
+        setText(formattedText);
     };
 
-    // Manejador para guardar la queja
-    const handleSave = async () => {
+      // Manejador para guardar la queja
+      const handleSave = async () => {
         if (!text.trim()) {
             Swal.fire({
                 icon: 'warning',
@@ -50,24 +33,14 @@ const CrearQuejaC = () => {
 
         setIsSaving(true);
         try {
-            const now = new Date();
-            const fecha = now.toISOString().split('T')[0]; // Formato YYYY-MM-DD
-            const hora = now.toTimeString().split(' ')[0]; // Formato HH:MM:SS
-
-            const response = await fetch('http://localhost:3002/Quejas', { // Ajusta la URL según la configuración de tu API
+            const response = await fetch('http://localhost:5000/api/quejas', { // Ajusta la URL según la configuración de tu API
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    id: uuidv4(), // Genera un ID único
-                    texto: text,
-                    usuarioId: userId, // Incluye el ID del usuario
-                    nombre: userData?.Nombre || '', // Usa el nombre del usuario
-                    correo: userData?.Correo || '', // Usa el correo del usuario
-                    fecha: fecha, // Incluye la fecha
-                    hora: hora, // Incluye la hora
-                    Respuesta: '' // Inicialmente vacío
+                    contenido: text, // El contenido de la queja
+                    usuarioId: userId, // Asegurándote de pasar el 'usuarioId' correctamente
                 }),
             });
 
@@ -113,7 +86,7 @@ const CrearQuejaC = () => {
                             onChange={handleChange}
                         />
                         <div className="char-count">
-                            {maxLength - text.length} caracteres restantes
+                            {maxLength - text.length} caracteres restantes {/* Aquí se muestra la cuenta regresiva */}
                         </div>
                     </div>
                     <button onClick={handleSave} disabled={isSaving}>

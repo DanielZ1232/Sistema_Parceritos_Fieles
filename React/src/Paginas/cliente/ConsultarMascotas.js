@@ -9,31 +9,33 @@ import { Link } from 'react-router-dom';
 
 const ConsultarMascotas = () => {
   const [mascotas, setMascotas] = useState([]);
-  const userId = localStorage.getItem('usuarioId'); // Obtén el ID del usuario desde el localStorage
+  const userId = localStorage.getItem('usuarioId');
+console.log('Usuario ID:', userId);  // Verifica que el usuarioId se obtiene correctamente
 
-  useEffect(() => {
-    const fetchMascotas = async () => {
-      try {
-        const response = await fetch('http://localhost:3002/Mascotas'); // URL del endpoint
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Datos obtenidos:', data);
-          
-          // Filtra las mascotas del usuario actual
-          const filteredMascotas = data.filter(mascota => mascota.usuarioId === String(userId));
-          console.log('Mascotas filtradas:', filteredMascotas);
-          
-          setMascotas(filteredMascotas);
-        } else {
-          console.error('Error al obtener las mascotas:', response.status);
-        }
-      } catch (error) {
-        console.error('Error de red:', error);
+
+useEffect(() => {
+  const fetchMascotas = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/usuarios/${userId}/mascotas`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Datos obtenidos desde el backend:', data);
+        setMascotas(data);
+      } else {
+        console.error('Error al obtener las mascotas:', response.status);
       }
-    };
+    } catch (error) {
+      console.error('Error de red:', error);
+    }
+  };
 
+  if (userId) {
     fetchMascotas();
-  }, [userId]);
+  } else {
+    console.log('Usuario ID no encontrado en localStorage');
+  }
+}, [userId]);
+
 
   return (
     <div className="page-container">
@@ -55,17 +57,16 @@ const ConsultarMascotas = () => {
                 <tbody>
                   {mascotas.length > 0 ? (
                     mascotas.map((mascota) => (
-                      <tr key={mascota.id}>
+                      <tr key={mascota.id_Mascota}>
                         <td>{mascota.nombre}</td>
                         <td>{mascota.raza}</td>
                         <td>{mascota.edad}</td>
                         <td>
-                          <Link to={`/perfil-mascota/${mascota.id}`}>
-                            <FontAwesomeIcon icon={faUser} size="lg" className="profile-icon"
-                            style={{textDecoration: 'none',
-                              color: 'black'
-                            }} />
-                          </Link>
+                        <Link to={`/perfil-mascota/${mascota.id_Mascota}`}>
+                        <FontAwesomeIcon icon={faUser} size="lg" className="profile-icon"
+                            style={{textDecoration: 'none', color: 'black'}} 
+                           />
+                        </Link>
                         </td>
                       </tr>
                     ))
