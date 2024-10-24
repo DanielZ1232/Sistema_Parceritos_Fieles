@@ -14,32 +14,24 @@ const ConsultarReservaC = () => {
   const [availableDates, setAvailableDates] = useState([]); // Estado para fechas disponibles
   const [states, setStates] = useState([]); // Estado para estados únicos
   const userId = localStorage.getItem('usuarioId');
+  console.log(userId);  // Asegúrate de que esto muestre el ID correcto
 
   useEffect(() => {
     const fetchReservas = async () => {
       try {
-        const response = await fetch('http://localhost:3002/Reservas');
+        const response = await fetch(`http://localhost:5000/api/reservas/${userId}`);
         if (response.ok) {
           const reservasData = await response.json();
-          const userReservas = reservasData.filter(reserva => reserva.usuarioId === userId);
-          setReservas(userReservas);
-          setFilteredReservas(userReservas);
-
-          // Extrae las fechas únicas de las reservas para el filtro
-          const dates = Array.from(new Set(userReservas.map(reserva => reserva.fechaInicio)));
+          setReservas(reservasData);
+          setFilteredReservas(reservasData);
+    
+          // Extraer fechas únicas para el filtro
+          const dates = Array.from(new Set(reservasData.map(reserva => reserva.fecha_Inicio)));
           setAvailableDates(dates);
-
-          // Extrae los estados únicos de las reservas para el filtro
-          const estados = Array.from(new Set(userReservas.map(reserva => reserva.estado || 'Por Confirmar')));
+    
+          // Extraer estados únicos
+          const estados = Array.from(new Set(reservasData.map(reserva => reserva.estado || 'Por Confirmar')));
           setStates(estados);
-
-          // Añade los estados "Cancelada" y "Asistida" si no están ya en los estados disponibles
-          const additionalStates = ['Cancelada', 'Asistida'];
-          additionalStates.forEach(state => {
-            if (!estados.includes(state)) {
-              setStates(prevStates => [...prevStates, state]);
-            }
-          });
         } else {
           console.error('Error al obtener las reservas:', response.status);
         }
@@ -52,33 +44,31 @@ const ConsultarReservaC = () => {
   }, [userId]);
 
   const handleCancel = async (id) => {
-    // Mostrar confirmación antes de cancelar la reserva
     const result = await Swal.fire({
       title: '¿Estás seguro?',
       text: 'No podrás revertir esto.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6', // Color del botón de confirmar
-      cancelButtonColor: '#d33', // Color del botón de cancelar
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, cancelar',
       cancelButtonText: 'No, mantener'
     });
 
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:3002/Reservas/${id}`, {
+        const response = await fetch(`http://localhost:5000/api/reservas/${id}`, {
           method: 'DELETE',
         });
         if (response.ok) {
           setReservas(reservas.filter(reserva => reserva.id !== id));
           setFilteredReservas(filteredReservas.filter(reserva => reserva.id !== id));
 
-          // Mostrar mensaje de éxito
           Swal.fire({
             title: '¡Cancelada!',
             text: 'La reserva ha sido cancelada.',
             icon: 'success',
-            confirmButtonColor: '#3085d6' // Color del botón de confirmar
+            confirmButtonColor: '#3085d6'
           });
         } else {
           console.error('Error al cancelar la reserva:', response.status);
@@ -104,7 +94,7 @@ const ConsultarReservaC = () => {
   const filterReservations = (date, state) => {
     let filtered = reservas;
     if (date) {
-      filtered = filtered.filter(reserva => reserva.fechaInicio === date);
+      filtered = filtered.filter(reserva => reserva.fecha_Inicio === date);
     }
     if (state) {
       filtered = filtered.filter(reserva => reserva.estado === state);
@@ -125,7 +115,7 @@ const ConsultarReservaC = () => {
               id="filterDate" 
               value={filterDate}
               onChange={handleDateChange}
-              min={availableDates.length > 0 ? availableDates[0] : ''} // Establece la fecha mínima disponible
+              min={availableDates.length > 0 ? availableDates[0] : ''} 
             />
           </div>
           <div>
@@ -155,29 +145,34 @@ const ConsultarReservaC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredReservas.map(reserva => (
-              <tr key={reserva.id}>
-                <td>{reserva.fechaInicio}</td>
-                <td>{reserva.fechaFinal}</td>
-                <td>{reserva.celular}</td>
-                <td>{reserva.correo}</td>
-                <td>{reserva.mascota}</td>
-                <td>{reserva.estado || 'Por Confirmar'}</td>
-                <td>
-                  <FontAwesomeIcon 
-                    icon={faTimes} 
-                    size="lg" 
-                    className={styles.cancelIcon} 
-                    onClick={() => handleCancel(reserva.id)}
-                  />
-                </td>
+            {filteredReservas.length > 0 ? (
+              filteredReservas.map(reserva => (
+                <tr key={reserva.id_Reservas}>
+                  <td>{new Date(reserva.fecha_Inicio).toLocaleDateString()}</td>
+                  <td>{new Date(reserva.fecha_Fin).toLocaleDateString()}</td>
+                  <td>{reserva.celular}</td>
+                  <td>{reserva.correo}</td>
+                  <td>{reserva.nombreMascota}</td>
+                  <td>{reserva.estado || 'Por Confirmar'}</td>
+                  <td>
+                    <FontAwesomeIcon 
+                      icon={faTimes} 
+                      size="lg" 
+                      className={styles.cancelIcon} 
+                      onClick={() => handleCancel(reserva.id_Reservas)}
+                    />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center' }}>No hay reservas disponibles</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
       <Footer className={styles.footer} />
-      {/* Botón flotante de WhatsApp */}
       <a href="https://wa.me/1234567890" className={styles.whatsappButton} target="_blank" rel="noopener noreferrer">
         <i className="fab fa-whatsapp"></i>
       </a>

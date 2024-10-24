@@ -220,64 +220,63 @@ const Index2 = () => {
       const handleRegisterSubmit = async (e) => {
         e.preventDefault();
         if (registerContraseña !== registerConfirmarContraseña) {
-            Swal.fire({ title: 'Error', text: 'Las contraseñas no coinciden', icon: 'error' });
-            return;
+          Swal.fire({ title: 'Error', text: 'Las contraseñas no coinciden', icon: 'error' });
+          return;
         }
-
-    
+      
         if (!validatePassword(registerContraseña)) {
-            Swal.fire({ title: 'Error', text: 'La contraseña debe contener al menos una letra mayúscula, un número y un signo especial', icon: 'error' });
-            return;
+          Swal.fire({ title: 'Error', text: 'La contraseña debe contener al menos una letra mayúscula, un número y un signo especial', icon: 'error' });
+          return;
         }
 
-  try {
-    // Crear el nuevo usuario
-    const nuevoUsuario = {
-      Nombre: registerNombre,
-      Apellido: registerApellido,
-      Correo: registerCorreo,
-      Celular: registerCelular,
-      Direccion: registerDireccion,
-      TipoDocumento: registerTipoDocumento,
-      NumeroDocumento: registerNumeroDocumento,
-      Contraseña: registerContraseña,
-      Rol: 'Cliente',
-    };
-
-    // Enviar la solicitud al backend
-    await axios.post('http://localhost:5000/api/users', nuevoUsuario);
-
-    Swal.fire({
-      title: 'Registrado con éxito',
-      text: 'Usuario registrado con éxito',
-      icon: 'success',
-      confirmButtonColor: '#3085d6',
-      confirmButtonText: 'Aceptar'
-    }).then(() => {
-      setRegisterModalVisible(false); // Cierra el modal después de registrar
-    });
-
-  } catch (error) {
-    if (error.response && error.response.status === 409) {
-      Swal.fire({
-        title: 'Error',
-        text: 'Ya existe un usuario con este correo',
-        icon: 'error',
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: 'Aceptar'
-      });
-    } else {
-      console.error('Error al registrar usuario:', error);
-      Swal.fire({
-        title: 'Error',
-        text: 'Error al registrar usuario',
-        icon: 'error',
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: 'Aceptar'
-      });
-    }
-  }
-};
+        try {
+            // Crear el nuevo usuario
+            const nuevoUsuario = {
+              Nombre: registerNombre,
+              Apellido: registerApellido,
+              Correo: registerCorreo,
+              Celular: registerCelular,
+              Direccion: registerDireccion,
+              TipoDocumento: registerTipoDocumento,
+              NumeroDocumento: registerNumeroDocumento,
+              Contraseña: registerContraseña,
+              Rol: 'Cliente',
+            };
+        
+            // Enviar la solicitud al backend usando la ruta correcta
+            await axios.post('http://localhost:5000/api/register', nuevoUsuario);
+        
+            Swal.fire({
+              title: 'Registrado con éxito',
+              text: 'Usuario registrado con éxito',
+              icon: 'success',
+              confirmButtonColor: '#3085d6',
+              confirmButtonText: 'Aceptar'
+            }).then(() => {
+              setRegisterModalVisible(false); // Cierra el modal después de registrar
+            });
+        
+          } catch (error) {
+            if (error.response && error.response.status === 409) {
+              Swal.fire({
+                title: 'Error',
+                text: 'Ya existe un usuario con este correo',
+                icon: 'error',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Aceptar'
+              });
+            } else {
+              console.error('Error al registrar usuario:', error);
+              Swal.fire({
+                title: 'Error',
+                text: 'Error al registrar usuario',
+                icon: 'error',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Aceptar'
+              });
+            }
+          }
+        };
 
 // Función para validar la contraseña
 const validatePassword = (password) => {

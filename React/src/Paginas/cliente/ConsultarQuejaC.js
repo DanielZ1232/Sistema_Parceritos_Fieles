@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBarCliente from '../../components/navBarCliente';
 import Footer from '../../components/footer';
 import './consultarQuejasC.css';
@@ -8,22 +8,21 @@ const ConsultarQuejasC = () => {
     const [quejas, setQuejas] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [quejaSeleccionada, setQuejaSeleccionada] = useState(null);
-    const [fechaFiltro, setFechaFiltro] = useState(''); // Estado para el filtro de fecha
-    const userId = localStorage.getItem('usuarioId'); // Obtén el ID del usuario desde el localStorage
+    const userId = localStorage.getItem('usuarioId');
 
     // Función para obtener las quejas del backend
     const fetchQuejas = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/quejas/${userId}`); // Ajustar la ruta al endpoint correcto
+            const response = await fetch(`http://localhost:5000/api/quejas/${userId}`);
             let data = await response.json();
 
-            // Ordenar las quejas en orden descendente (la más reciente primero)
-            data.reverse();
-
-            // Filtrar por fecha si se selecciona en el filtro
-            if (fechaFiltro) {
-                data = data.filter(queja => new Date(queja.fecha) >= new Date(fechaFiltro));
+            if (!Array.isArray(data)) {
+                console.error('La respuesta no es un array', data);
+                data = []; 
             }
+
+            // Ordenar las quejas por fecha en orden descendente
+            data.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
             setQuejas(data);
         } catch (error) {
@@ -31,10 +30,9 @@ const ConsultarQuejasC = () => {
         }
     };
 
-    // Ejecutar fetchQuejas al montar el componente y cuando el filtro de fecha cambie
     useEffect(() => {
         fetchQuejas();
-    }, [fechaFiltro]); // Se ejecuta cada vez que cambia el filtro de fecha
+    }, []);
 
     const toggleQueja = (event) => {
         const row = event.currentTarget.closest('tr').nextElementSibling;
@@ -55,7 +53,6 @@ const ConsultarQuejasC = () => {
         setQuejaSeleccionada(null);
     };
 
-    // Función para actualizar una queja
     const actualizarQueja = async (event) => {
         event.preventDefault();
 
@@ -79,7 +76,7 @@ const ConsultarQuejasC = () => {
                 timer: 1500
             });
 
-            fetchQuejas(); // Recargar quejas actualizadas
+            fetchQuejas();
             closeModal();
         } catch (error) {
             console.error('Error al actualizar la queja:', error);
@@ -93,25 +90,12 @@ const ConsultarQuejasC = () => {
                 <div className="content">
                     <h2>Quejas</h2>
                     <p>Estas son las quejas registradas por usted en el sistema</p>
-
-                    {/* Filtro por fecha */}
-                    <div className="filter-section">
-                        <label htmlFor="fechaFiltro">Filtrar por fecha (desde): </label>
-                        <input
-                            type="date"
-                            id="fechaFiltro"
-                            value={fechaFiltro}
-                            onChange={(e) => setFechaFiltro(e.target.value)}
-                        />
-                    </div>
-                    <br></br>
-
+    
                     <div className="table-container">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Fecha</th>
-                                    <th>Hora</th>
+                                    <th>Fecha</th> {/* Columna para la fecha */}
                                     <th>Nombre</th>
                                     <th>Correo</th>
                                     <th>Celular</th>
@@ -122,8 +106,8 @@ const ConsultarQuejasC = () => {
                                 {quejas.map((queja, index) => (
                                     <React.Fragment key={index}>
                                         <tr>
-                                            <td>{queja.fecha || 'Desconocida'}</td>
-                                            <td>{queja.hora || 'Desconocida'}</td>
+                                            {/* Mostrar solo la parte de la fecha */}
+                                            <td>{queja.fecha ? new Date(queja.fecha).toLocaleDateString() : 'Desconocida'}</td>
                                             <td>{queja.nombre || 'Desconocido'}</td>
                                             <td>{queja.correo || 'Desconocido'}</td>
                                             <td>{queja.celular || 'Desconocido'}</td>
@@ -136,7 +120,7 @@ const ConsultarQuejasC = () => {
                                             </td>
                                         </tr>
                                         <tr className="queja-row" style={{ display: 'none' }}>
-                                            <td colSpan="6">
+                                            <td colSpan="5"> {/* Ajustar colspan a 5 */}
                                                 <div className="queja-content">
                                                     <p>{queja.contenido || 'No hay detalle de la queja.'}</p>
                                                     <button className="actualizar-btn" onClick={() => showUpdateModal(queja)}>Actualizar</button>
@@ -151,9 +135,6 @@ const ConsultarQuejasC = () => {
                 </div>
             </div>
             <Footer className="footer-sticky" />
-            <a href="https://wa.me/1234567890" className="whatsapp-button" target="_blank" rel="noopener noreferrer">
-                <i className="fab fa-whatsapp"></i>
-            </a>
 
             {modalVisible && quejaSeleccionada && (
                 <div className="modal">

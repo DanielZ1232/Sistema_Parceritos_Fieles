@@ -89,10 +89,13 @@ app.get('/api/users', (req, res) => {
         }
   
         console.log('Usuario creado exitosamente con ID:', result.insertId);
+  
+        // No necesitamos agregar nada aquí para el cliente, ya que el trigger lo maneja
         res.status(201).json({ message: 'Usuario registrado exitosamente como Cliente.' });
       });
     });
   });
+  
   
   
   
@@ -145,12 +148,11 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-
-// Nuevo endpoint para registrar mascotas
+//registrar mascota
 app.post('/api/mascotas', (req, res) => {
   const { nombre, raza, enfermedades, peso, edad, sexo, esterilizado, usuarioId } = req.body;
 
-  console.log('Datos recibidos:', req.body);  // Verificar que los datos estén llegando correctamente
+  console.log('Datos recibidos:', req.body);  // Verificar que los datos están llegando
 
   // Verificar que todos los campos existan
   if (!nombre || !raza || !enfermedades || !peso || !edad || !sexo || !esterilizado || !usuarioId) {
@@ -158,21 +160,50 @@ app.post('/api/mascotas', (req, res) => {
     return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
   }
 
-  const insertarMascotaQuery = `
-    INSERT INTO mascotas (nombre, raza, enfermedades, peso, edad, sexo, esterilizado, id_UsuarioFK)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `;
+  // Obtener el cliente relacionado
+  const clienteQuery = `SELECT id_Cliente FROM cliente WHERE id_Usuario = ? LIMIT 1`;
 
-  db.query(insertarMascotaQuery, [nombre, raza, enfermedades, peso, edad, sexo, esterilizado, usuarioId], (err, result) => {
-    if (err) {
-      console.error('Error detallado en la inserción:', err);  // Imprimir detalles del error
-      return res.status(500).json({ error: 'Error al registrar la mascota.' });
+
+  db.query(clienteQuery, [usuarioId], (err, resultCliente) => {
+    if (err || resultCliente.length === 0) {
+      console.error('Error al obtener el cliente:', err);
+      return res.status(500).json({ error: 'Error al obtener el cliente relacionado.' });
     }
 
-    console.log('Mascota registrada exitosamente:', result);
-    res.status(201).json({ message: 'Mascota registrada exitosamente', mascotaId: result.insertId });
+    const clienteId = resultCliente[0].id_Cliente;
+
+    // Insertar la mascota
+    const insertarMascotaQuery = `
+      INSERT INTO mascotas (nombre, raza, enfermedades, peso, edad, sexo, esterilizado, id_UsuarioFK)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(insertarMascotaQuery, [nombre, raza, enfermedades, peso, edad, sexo, esterilizado, usuarioId], (err, resultMascota) => {
+      if (err) {
+        console.error('Error al registrar la mascota:', err);
+        return res.status(500).json({ error: 'Error al registrar la mascota.' });
+      }
+
+      const mascotaId = resultMascota.insertId;
+
+      // Insertar la relación cliente-mascota
+      const insertarClienteMascotaQuery = `
+        INSERT INTO clientemascota (id_ClienteFK1, id_MascotaFK)
+        VALUES (?, ?)
+      `;
+
+      db.query(insertarClienteMascotaQuery, [clienteId, mascotaId], (err, resultRelacion) => {
+        if (err) {
+          console.error('Error al crear la relación cliente-mascota:', err);
+          return res.status(500).json({ error: 'Error al crear la relación cliente-mascota.' });
+        }
+
+        res.status(201).json({ message: 'Mascota registrada exitosamente y relación cliente-mascota creada.' });
+      });
+    });
   });
 });
+
 
 
 // Endpoint para obtener las mascotas de un usuario específico
@@ -277,17 +308,13 @@ app.post('/api/quejas', (req, res) => {
 
 
 
-
-// Obtener todas las quejas de un usuario específico
 app.get('/api/quejas/:usuarioId', (req, res) => {
-  const usuarioId = req.params.usuarioId; // El ID del usuario obtenido desde la URL
+  const usuarioId = req.params.usuarioId;
 
   const query = `
     SELECT 
       quejas.id_Queja, 
       quejas.contenido, 
-      quejas.fecha, 
-      quejas.hora, 
       usuario.nombre, 
       usuario.correo, 
       usuario.celular 
@@ -307,9 +334,15 @@ app.get('/api/quejas/:usuarioId', (req, res) => {
       return res.status(500).json({ error: 'Error al obtener las quejas.' });
     }
 
-    res.status(200).json(results); // Devolver los resultados en formato JSON
+    if (!Array.isArray(results)) {
+      return res.status(500).json({ error: 'La consulta no devolvió un array.' });
+    }
+
+    res.status(200).json(results); // Devolver los resultados correctamente si los hay
   });
 });
+
+
 
 
 
@@ -391,5 +424,112 @@ app.get('/mascotas/reservas/:tipoAsistencia', (req, res) => {
       return res.status(500).send(`Error al obtener mascotas: ${err.message}`);  // Enviar el error detallado al cliente
     }
     res.status(200).json(results);
+  });
+});
+
+
+
+// Ruta para crear reservas
+app.post('/api/reservas', (req, res) => {
+  let { fechaInicio, fechaFinal, idMascota, usuarioId, tipoServicio } = req.body;
+
+  if (!fechaInicio || !fechaFinal || !idMascota || !usuarioId || !tipoServicio) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+  }
+
+  // Normalizamos el texto del servicio (en caso de que sea necesario)
+  tipoServicio = tipoServicio.toLowerCase();
+
+  // Insertar la reserva en la tabla 'reservas'
+  const queryReserva = `INSERT INTO reservas (fecha_Inicio, fecha_Fin, id_MascotaFK, id_UsuarioFK, tipo_servicio)
+                        VALUES (?, ?, ?, ?, ?)`;
+
+  db.query(queryReserva, [fechaInicio, fechaFinal, idMascota, usuarioId, tipoServicio], (err, result) => {
+    if (err) {
+      console.error('Error al crear la reserva:', err);
+      return res.status(500).json({ error: 'Error al crear la reserva.' });
+    }
+
+    // Si se inserta la reserva correctamente
+    res.status(201).json({ message: 'Reserva creada exitosamente.' });
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+// Endpoint para obtener las reservas de un usuario específico por su ID
+app.get('/api/reservas/:usuarioId', (req, res) => {
+  const usuarioId = req.params.usuarioId;
+
+  const query = `
+    SELECT 
+      reservas.id_Reservas, 
+      reservas.fecha_Inicio, 
+      reservas.fecha_Fin, 
+      usuario.nombre AS nombreUsuario, 
+      usuario.correo, 
+      usuario.celular, 
+      mascotas.nombre AS nombreMascota, 
+      reservas.estado
+    FROM 
+      reservas
+    JOIN 
+      usuario 
+    ON 
+      usuario.id_Usuario = reservas.id_UsuarioFK
+    JOIN 
+      mascotas 
+    ON 
+      reservas.id_MascotaFK = mascotas.id_Mascota
+    WHERE 
+      usuario.id_Usuario = ?
+  `;
+
+  db.query(query, [usuarioId], (err, results) => {
+    if (err) {
+      console.error('Error al obtener las reservas:', err);
+      return res.status(500).json({ error: 'Error al obtener las reservas.' });
+    }
+
+    if (!Array.isArray(results)) {
+      return res.status(500).json({ error: 'La consulta no devolvió un array válido.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron reservas para este usuario.' });
+    }
+
+    res.status(200).json(results);
+  });
+});
+
+
+
+// Endpoint para eliminar una reserva específica
+app.delete('/api/reservas/:id', (req, res) => {
+  const reservaId = req.params.id;
+
+  const query = 'DELETE FROM reservas WHERE id_Reserva = ?';
+  
+  db.query(query, [reservaId], (err, result) => {
+    if (err) {
+      console.error('Error al eliminar la reserva:', err);
+      return res.status(500).json({ error: 'Error al eliminar la reserva.' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Reserva no encontrada.' });
+    }
+
+    res.status(200).json({ message: 'Reserva eliminada exitosamente.' });
   });
 });
