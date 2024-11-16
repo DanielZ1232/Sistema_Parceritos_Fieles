@@ -1,0 +1,130 @@
+/* CSS en ConsultarReservaC.module.css o equivalente */
+.pageContainer {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
+    margin: 20px;
+  }
+  
+  .title {
+    font-family: 'Poppins-SemiBold', sans-serif;
+    color: #28a745;
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #1db954, #1ca54f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  
+  .fadeIn {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  
+  .filterContainer {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .filterGroup {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .gridContainer {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+  }
+  
+  .card {
+    background-color: rgba(225, 215, 215, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    color: black;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .cancelIcon {
+    margin-top: 10px;
+    color: red;
+    cursor: pointer;
+  }
+  
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .paginationButton {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .paginationButton:hover {
+    background-color: #3e8e41;
+  }
+  
+  .footer {
+    background-color: #333;
+    padding: 20px;
+    text-align: center;
+    color: white;
+  }
+  
+  .whatsappButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #25D366;
+    color: #fff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 24px;
+    text-decoration: none;
+    z-index: 1000;
+  }
+  
+  .whatsappButton:hover {
+    background-color: #128C7E;
+  }
+  
